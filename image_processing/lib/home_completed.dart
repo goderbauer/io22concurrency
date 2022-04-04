@@ -21,6 +21,15 @@ class _HomeWidgetState extends State<HomeWidget> {
   Uint8List? _image;
   Uint8List? _originalImage;
 
+  void _showImagePicker({@required sync}) async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (sync) {
+      _loadImageSync(result?.files.single.path);
+    } else {
+      _loadImageAsync(result?.files.single.path);
+    }
+  }
+
   void _loadImageSync(String? path) {
     if (path == null) return;
 
@@ -47,13 +56,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       _originalImage = image;
       _showProgress = false;
     });
-  }
-
-  static Uint8List _applySepiaFilter(Uint8List original) {
-    final decoded = image.decodeImage(original.toList())!;
-    final sepia = image.sepia(decoded);
-    final encoded = Uint8List.fromList(image.encodeJpg(sepia));
-    return encoded;
   }
 
   void _applySepiaSync() {
@@ -90,13 +92,11 @@ class _HomeWidgetState extends State<HomeWidget> {
     });
   }
 
-  void _showImagePicker({@required sync}) async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (sync) {
-      _loadImageSync(result?.files.single.path);
-    } else {
-      _loadImageAsync(result?.files.single.path);
-    }
+  static Uint8List _applySepiaFilter(Uint8List original) {
+    final decoded = image.decodeImage(original.toList())!;
+    final sepia = image.sepia(decoded);
+    final encoded = Uint8List.fromList(image.encodeJpg(sepia));
+    return encoded;
   }
 
   void _undo() {
